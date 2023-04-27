@@ -8,7 +8,7 @@ require('dotenv').config()
 const stationsRouter = require('./routers/stations')
 const usersRouter = require('./routers/users')
 const authRouter = require('./routers/auth')
-const menuRouter = require('./routers/menu')
+const cartRouter = require('./routers/cart')
 
 const middleware = require('./middleware')
 
@@ -35,7 +35,7 @@ app.use(middleware.authorizeToken)
 
 app.use('/api', stationsRouter)
 app.use('/api/users', usersRouter)
-app.use('/api', menuRouter)
+app.use('/api', cartRouter)
 
 
 module.exports = app
