@@ -17,6 +17,7 @@ const orderSchema = new mongoose.Schema({
   });
   
   const cartSchema = new mongoose.Schema({
+    username: String,
     name: {
       type: String,
       required: true
