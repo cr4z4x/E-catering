@@ -7,8 +7,7 @@ const axios = require('axios')
 require('dotenv').config()
 const stationsRouter = require('./routers/stations')
 const usersRouter = require('./routers/users')
-const loginRouter = require('./routers/login')
-const registerRouter = require('./routers/register')
+const authRouter = require('./routers/auth')
 const menuRouter = require('./routers/menu')
 
 const middleware = require('./middleware')
@@ -29,8 +28,7 @@ mongoose.connect(url)
 app.use(bodyParser.json())
 app.use(cors())
 
-app.use('/api/users', registerRouter)
-app.use('/api/users', loginRouter)
+app.use('/api/users', authRouter)
 
 
 app.use(middleware.authorizeToken)
