@@ -13,14 +13,14 @@ const googleMapsClient = require('@google/maps').createClient({
 
 stationsRouter.get('/stations', async (req, res) => {
     try {
-        const trainNo = req.body.trainNo;
+        const trainNo = req.query.trainNo;
 
         const response = await fetch(`https://indian-railway-api.cyclic.app/trains/getRoute?trainNo=${trainNo}`);
         jresponse = await response.json();
 
 
         const time2 = '1.30';
-        const [hours1, minutes1] = req.body.time.split('.');
+        const [hours1, minutes1] = req.query.time.split('.');
         const [hours2, minutes2] = time2.split('.');
         const totalMinutes = Number(minutes1) + Number(minutes2);
         const totalHours = Number(hours1) + Number(hours2) + Math.floor(totalMinutes / 60);
