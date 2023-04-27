@@ -5,6 +5,12 @@ const stationsRouter = require('express').Router()
 const User = require('../models/user')
 require('dotenv').config()
 
+const https = require('https');
+const googleMapsClient = require('@google/maps').createClient({
+  key: process.env.API_KEY,
+  Promise: Promise
+});
+
 stationsRouter.get('/stations', async (req, res) => {
     try {
         const trainNo = req.body.trainNo;
@@ -36,6 +42,72 @@ stationsRouter.get('/stations', async (req, res) => {
         res.status(500).send('Internal server error');
     }
 });
+
+stationsRouter.get('/station', (req, res) => {
+    const stationName = req.query.name;
+
+    if (!stationName) {
+        return res.status(400).send('Missing required parameter: name');
+    }
+
+    const options = {
+        hostname: 'maps.googleapis.com',
+        port: 443,
+        path: `/maps/api/geocode/json?address=${encodeURIComponent(stationName)}&key=${process.env.API_KEY}`,
+        method: 'GET'
+    };
+
+    const request = https.request(options, (response) => {
+        let data = '';
+
+        response.on('data', (chunk) => {
+            data += chunk;
+        });
+
+        response.on('end', () => {
+            const location = JSON.parse(data).results[0].geometry.location;
+
+            // Get the top 5 nearest restaurants
+            googleMapsClient.placesNearby({
+                    location: `${location.lat},${location.lng}`,
+                    rankby: 'distance',
+                    type: 'restaurant'
+                }).asPromise()
+                .then((response) => {
+                    const results = response.json.results.slice(0, 5); // get the top 5 results
+                    const restaurants = results.map((result) => ({
+                        name: result.name,
+                        address: result.vicinity,
+                        rating: result.rating,
+                        location: result.geometry.location
+                    }));
+
+                    // Combine the station location and the restaurant information into one object
+                    const data = {
+                        station: {
+                            name: stationName,
+                            location: location
+                        },
+                        restaurants: restaurants
+                    };
+
+                    res.json(data.restaurants);
+                })
+                .catch((error) => {
+                    console.log(error);
+                    res.status(500).send('Internal Server Error');
+                });
+        });
+    });
+
+    request.on('error', (error) => {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    });
+
+    request.end();
+});
+
 
 
 
