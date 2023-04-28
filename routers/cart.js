@@ -13,16 +13,17 @@ cartRouter.post('/cart', async (req, res) => {
 
   cartRouter.get('/cart', async (req, res) => {
     let total = 0;
+    const confirmation = "confirmed";
     const cart = await Cart.findOne({
         username: req.username
     }).sort({$natural:-1}).limit(1);
 
-    let {username,name,orders } = cart;
+    let {username,name,orders} = cart;
 
     orders.forEach(order => {
       total += order.price * order.quantity;
     });
-    res.json({ username,name,total, orders });
+    res.json({ username,name,total, orders,confirmation });
   });
 
 module.exports = cartRouter
