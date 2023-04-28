@@ -11,4 +11,18 @@ cartRouter.post('/cart', async (req, res) => {
     res.send(cart);
   });
 
+  cartRouter.get('/cart', async (req, res) => {
+    let total = 0;
+    const cart = await Cart.findOne({
+        username: req.username
+    });
+
+    let {username,name,orders } = cart;
+
+    orders.forEach(order => {
+      total += order.price * order.quantity;
+    });
+    res.json({ username,name,total, orders });
+  });
+
 module.exports = cartRouter
