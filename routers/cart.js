@@ -15,7 +15,7 @@ cartRouter.post('/cart', async (req, res) => {
     let total = 0;
     const cart = await Cart.findOne({
         username: req.username
-    });
+    }).sort({$natural:-1}).limit(1);
 
     let {username,name,orders } = cart;
 
